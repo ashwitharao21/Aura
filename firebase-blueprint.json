@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with currency and savings goal configuration.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier of the authenticated user" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "photoURL": { "type": "string", "description": "User profile picture URL" },
+        "currency": { "type": "string", "description": "Primary currency standard, e.g. INR" },
+        "monthlySavingsGoal": { "type": "number", "description": "Target monthly savings goal" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of registration" },
+        "lastLoginAt": { "type": "string", "description": "ISO timestamp of latest session" }
+      },
+      "required": ["uid", "createdAt"]
+    },
+    "IncomeEntry": {
+      "title": "IncomeEntry",
+      "description": "Logged income stream transaction.",
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number", "description": "Income amount in local currency" },
+        "source": { "type": "string", "description": "Source or stream name e.g. Salary, Freelance" },
+        "category": { "type": "string", "description": "Optional category" },
+        "date": { "type": "string", "description": "Transaction date YYYY-MM-DD" },
+        "notes": { "type": "string", "description": "Optional user notes" },
+        "isRecurring": { "type": "boolean", "description": "Whether this income repeats monthly" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" }
+      },
+      "required": ["amount", "source", "date", "createdAt"]
+    },
+    "ExpenseEntry": {
+      "title": "ExpenseEntry",
+      "description": "Logged expense transaction record.",
+      "type": "object",
+      "properties": {
+        "amount": { "type": "number", "description": "Expense amount in local currency" },
+        "category": { "type": "string", "description": "Expense category e.g. Groceries, Rent" },
+        "paymentMethod": { "type": "string", "description": "Payment mode e.g. UPI, Credit Card, Cash" },
+        "date": { "type": "string", "description": "Transaction date YYYY-MM-DD" },
+        "notes": { "type": "string", "description": "Optional user notes" },
+        "tag": { "type": "string", "description": "Optional custom tag" },
+        "isRecurring": { "type": "boolean", "description": "Whether this expense repeats monthly" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" }
+      },
+      "required": ["amount", "category", "paymentMethod", "date", "createdAt"]
+    },
+    "BudgetEntry": {
+      "title": "BudgetEntry",
+      "description": "Monthly spending limit target for a specific category.",
+      "type": "object",
+      "properties": {
+        "category": { "type": "string", "description": "Target expense category" },
+        "limit": { "type": "number", "description": "Monthly spending ceiling" },
+        "monthYear": { "type": "string", "description": "Target month in YYYY-MM format" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" }
+      },
+      "required": ["category", "limit", "monthYear", "createdAt"]
+    },
+    "ChatSession": {
+      "title": "ChatSession",
+      "description": "AI consultation conversation session.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Session topic headline" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of latest message" },
+        "lastMessageSnippet": { "type": "string", "description": "Brief preview snippet of the last message" }
+      },
+      "required": ["title", "createdAt", "updatedAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Individual message in an AI advisory session.",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "description": "Message author: user, assistant, or system" },
+        "content": { "type": "string", "description": "Message text payload" },
+        "timestamp": { "type": "string", "description": "ISO timestamp of message dispatch" },
+        "modelUsed": { "type": "string", "description": "Gemini model version e.g. gemini-3.6-flash" }
+      },
+      "required": ["role", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Isolated user profile document"
+    },
+    "/users/{userId}/income/{incomeId}": {
+      "schema": { "$ref": "#/entities/IncomeEntry" },
+      "description": "User income transaction records"
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/ExpenseEntry" },
+      "description": "User expense transaction records"
+    },
+    "/users/{userId}/budgets/{budgetId}": {
+      "schema": { "$ref": "#/entities/BudgetEntry" },
+      "description": "User monthly category budget targets"
+    },
+    "/users/{userId}/chat_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/ChatSession" },
+      "description": "User AI consultation conversation threads"
+    },
+    "/users/{userId}/chat_sessions/{sessionId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Individual messages in an AI session"
+    }
+  }
+}

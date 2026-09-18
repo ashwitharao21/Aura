@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-aura-mint: #7ED4C9;
+    --color-aura-mint-deep: #4AA89E;
+    --color-aura-mint-light: #B3E5DF;
+    --color-warm-glow: #FFB7A5;
+    --color-warm-glow-deep: #FF9A8B;
+    --color-morning-mist: #FBF7F0;
+    --color-lavender-haze: #C6B9E0;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #FBF7F0;
+    color: #1E293B;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes auraGlow {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-aura-glow {
+  animation: auraGlow 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: floatSubtle 4s ease-in-out infinite;
+}
+
+/* Custom Aura Gradient utility */
+.bg-aura-gradient {
+  background: linear-gradient(135deg, #7ED4C9 0%, #C6B9E0 50%, #FFB7A5 100%);
+}
+
+.bg-aura-soft {
+  background: linear-gradient(135deg, rgba(126, 212, 201, 0.15) 0%, rgba(198, 185, 224, 0.15) 50%, rgba(255, 183, 165, 0.15) 100%);
+}
+
+.border-aura-gradient {
+  border-image: linear-gradient(135deg, #7ED4C9, #C6B9E0, #FFB7A5) 1;
+}
+
+
