@@ -12,7 +12,8 @@ import {
   ArrowUpDown, 
   SlidersHorizontal,
   Repeat,
-  X
+  X,
+  RotateCcw
 } from "lucide-react";
 import { ExpenseEntry } from "../types";
 import { EXPENSE_CATEGORIES, PAYMENT_METHODS, getCategoryMeta } from "../data/categories";
@@ -46,6 +47,7 @@ export const ExpenseView: React.FC<ExpenseViewProps> = ({
         item.category.toLowerCase().includes(q) ||
         item.paymentMethod.toLowerCase().includes(q) ||
         (item.notes ? item.notes.toLowerCase().includes(q) : false) ||
+        (item.tag ? item.tag.toLowerCase().includes(q) : false) ||
         item.date.includes(q) ||
         item.amount.toString().includes(q);
       const matchesCategory = selectedCategory === "all" || item.category === selectedCategory;
@@ -67,6 +69,8 @@ export const ExpenseView: React.FC<ExpenseViewProps> = ({
   const totalFilteredExpense = useMemo(() => {
     return processedExpenses.reduce((sum, item) => sum + item.amount, 0);
   }, [processedExpenses]);
+
+  const isFiltering = searchQuery.trim().length > 0 || selectedCategory !== "all" || selectedPaymentMethod !== "all";
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -172,7 +176,7 @@ export const ExpenseView: React.FC<ExpenseViewProps> = ({
           <input
             id="expense-search-input"
             type="text"
-            placeholder="Search note content, category, or payment method..."
+            placeholder="Search description, notes, category, payment method..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#FBF7F0] border border-[#7ED4C9]/40 focus:border-[#4AA89E] focus:ring-1 focus:ring-[#4AA89E] rounded-2xl py-2 pl-10 pr-9 text-xs font-semibold text-slate-900 placeholder-slate-400 outline-none transition-all"
@@ -191,6 +195,21 @@ export const ExpenseView: React.FC<ExpenseViewProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          {/* Category Filter Dropdown */}
+          <select
+            id="expense-category-filter"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="bg-[#FBF7F0] border border-[#7ED4C9]/40 rounded-2xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-[#4AA89E] cursor-pointer"
+          >
+            <option value="all">All Categories ({expenses.length})</option>
+            {EXPENSE_CATEGORIES.map((cat) => (
+              <option key={cat.name} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+
           {/* Payment Method Filter */}
           <select
             id="expense-payment-method-filter"
@@ -218,6 +237,23 @@ export const ExpenseView: React.FC<ExpenseViewProps> = ({
             <option value="amount-desc">Highest Amount</option>
             <option value="amount-asc">Lowest Amount</option>
           </select>
+
+          {/* Reset Filters Shortcut */}
+          {isFiltering && (
+            <button
+              id="reset-expense-filters-header-btn"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("all");
+                setSelectedPaymentMethod("all");
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold text-[#E07A5F] bg-[#FFB7A5]/20 hover:bg-[#FFB7A5]/35 transition-colors cursor-pointer"
+              title="Reset all filters"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -234,12 +270,26 @@ export const ExpenseView: React.FC<ExpenseViewProps> = ({
                 ? "Try clearing filters to view all expense transactions."
                 : "Record your daily purchases to start tracking your outflow."}
             </p>
-            <button
-              onClick={() => onOpenAddModal("expense")}
-              className="mt-4 px-5 py-2.5 bg-gradient-to-r from-[#FF9A8B] to-[#FFB7A5] hover:from-[#F38573] hover:to-[#FF9A8B] text-slate-900 font-extrabold rounded-2xl text-xs transition-all shadow-sm cursor-pointer border border-[#FF9A8B]/60"
-            >
-              + Add Expense Record
-            </button>
+            {isFiltering ? (
+              <button
+                id="reset-expense-empty-filters-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                  setSelectedPaymentMethod("all");
+                }}
+                className="mt-4 px-4 py-2 bg-[#FFB7A5]/25 hover:bg-[#FFB7A5]/40 text-[#E07A5F] border border-[#FFB7A5]/50 rounded-2xl text-xs font-extrabold transition-all cursor-pointer"
+              >
+                Reset All Filters
+              </button>
+            ) : (
+              <button
+                onClick={() => onOpenAddModal("expense")}
+                className="mt-4 px-5 py-2.5 bg-gradient-to-r from-[#FF9A8B] to-[#FFB7A5] hover:from-[#F38573] hover:to-[#FF9A8B] text-slate-900 font-extrabold rounded-2xl text-xs transition-all shadow-sm cursor-pointer border border-[#FF9A8B]/60"
+              >
+                + Add Expense Record
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">

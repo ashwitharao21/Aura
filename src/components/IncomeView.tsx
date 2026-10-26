@@ -13,7 +13,8 @@ import {
   TrendingUp, 
   Sparkles,
   X,
-  ArrowUpDown
+  ArrowUpDown,
+  RotateCcw
 } from "lucide-react";
 import { IncomeEntry } from "../types";
 import { INCOME_SOURCES, getIncomeSourceMeta } from "../data/categories";
@@ -67,6 +68,8 @@ export const IncomeView: React.FC<IncomeViewProps> = ({
   const totalFilteredIncome = useMemo(() => {
     return filteredIncomes.reduce((sum, item) => sum + item.amount, 0);
   }, [filteredIncomes]);
+
+  const isFiltering = searchQuery.trim().length > 0 || selectedSource !== "all";
 
   // Source breakdown calculation
   const sourceTotals = useMemo(() => {
@@ -166,13 +169,13 @@ export const IncomeView: React.FC<IncomeViewProps> = ({
       </div>
 
       {/* Control Bar: Search & Selectors */}
-      <div className="bg-white border border-[#7ED4C9]/35 rounded-3xl p-4 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:max-w-md">
+      <div className="bg-white border border-[#7ED4C9]/35 rounded-3xl p-4 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="relative w-full md:max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             id="income-search-input"
             type="text"
-            placeholder="Search by note content, category, or source..."
+            placeholder="Search description, notes, category, or source..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#FBF7F0] border border-[#7ED4C9]/40 focus:border-[#4AA89E] focus:ring-1 focus:ring-[#4AA89E] rounded-2xl py-2 pl-10 pr-9 text-xs font-semibold text-slate-900 placeholder-slate-400 outline-none transition-all"
@@ -190,7 +193,22 @@ export const IncomeView: React.FC<IncomeViewProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+          {/* Source / Category Filter */}
+          <select
+            id="income-source-filter"
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+            className="bg-[#FBF7F0] border border-[#7ED4C9]/40 rounded-2xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-[#4AA89E] cursor-pointer"
+          >
+            <option value="all">All Sources ({incomes.length})</option>
+            {INCOME_SOURCES.map((src) => (
+              <option key={src.name} value={src.name}>
+                {src.name}
+              </option>
+            ))}
+          </select>
+
           {/* Sort Selector */}
           <select
             id="income-sort-by-select"
@@ -204,7 +222,23 @@ export const IncomeView: React.FC<IncomeViewProps> = ({
             <option value="amount-asc">Lowest Amount</option>
           </select>
 
-          <div className="text-xs text-slate-500 font-bold whitespace-nowrap">
+          {/* Reset Filters Shortcut */}
+          {isFiltering && (
+            <button
+              id="reset-income-filters-header-btn"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedSource("all");
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold text-[#358E85] bg-[#7ED4C9]/20 hover:bg-[#7ED4C9]/35 transition-colors cursor-pointer"
+              title="Reset all filters"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          )}
+
+          <div className="text-xs text-slate-500 font-bold whitespace-nowrap pl-1">
             Showing {filteredIncomes.length} of {incomes.length}
           </div>
         </div>
@@ -223,12 +257,25 @@ export const IncomeView: React.FC<IncomeViewProps> = ({
                 ? "Try clearing filters to view all income entries."
                 : "Log your first income entry to start tracking your cashflow."}
             </p>
-            <button
-              onClick={() => onOpenAddModal("income")}
-              className="mt-4 px-5 py-2.5 bg-gradient-to-r from-[#7ED4C9] to-[#4AA89E] hover:from-[#5BC0BE] hover:to-[#358E85] text-slate-900 font-extrabold rounded-2xl text-xs transition-all shadow-sm cursor-pointer border border-[#4AA89E]/40"
-            >
-              + Add Income Entry
-            </button>
+            {isFiltering ? (
+              <button
+                id="reset-income-empty-filters-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedSource("all");
+                }}
+                className="mt-4 px-4 py-2 bg-[#7ED4C9]/25 hover:bg-[#7ED4C9]/40 text-[#358E85] border border-[#7ED4C9]/50 rounded-2xl text-xs font-extrabold transition-all cursor-pointer"
+              >
+                Reset All Filters
+              </button>
+            ) : (
+              <button
+                onClick={() => onOpenAddModal("income")}
+                className="mt-4 px-5 py-2.5 bg-gradient-to-r from-[#7ED4C9] to-[#4AA89E] hover:from-[#5BC0BE] hover:to-[#358E85] text-slate-900 font-extrabold rounded-2xl text-xs transition-all shadow-sm cursor-pointer border border-[#4AA89E]/40"
+              >
+                + Add Income Entry
+              </button>
+            )}
           </div>
         ) : (
           <div className="overflow-x-auto">

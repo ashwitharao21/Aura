@@ -28,9 +28,7 @@ import {
   UserProfile, 
   IncomeEntry, 
   ExpenseEntry, 
-  BudgetEntry, 
-  ChatMessage, 
-  ChatSession 
+  BudgetEntry 
 } from "../types";
 
 // Zero-Crash Payload Hygiene: strips undefined properties recursively
@@ -364,53 +362,4 @@ export async function saveBudget(userId: string, budget: Omit<BudgetEntry, "id" 
 export async function deleteBudget(userId: string, budgetId: string) {
   const docRef = doc(db, "users", userId, "budgets", budgetId);
   await deleteDoc(docRef);
-}
-
-// --- CHAT SESSIONS & MESSAGES ---
-export function subscribeToChatSessions(userId: string, onUpdate: (sessions: ChatSession[]) => void) {
-  const collRef = collection(db, "users", userId, "chat_sessions");
-  const q = query(collRef, orderBy("updatedAt", "desc"));
-  return onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ChatSession));
-    onUpdate(items);
-  });
-}
-
-export function subscribeToChatMessages(userId: string, sessionId: string, onUpdate: (messages: ChatMessage[]) => void) {
-  const collRef = collection(db, "users", userId, "chat_sessions", sessionId, "messages");
-  const q = query(collRef, orderBy("timestamp", "asc"));
-  return onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ChatMessage));
-    onUpdate(items);
-  });
-}
-
-export async function createChatSession(userId: string, title: string = "Financial Advisory"): Promise<string> {
-  const collRef = collection(db, "users", userId, "chat_sessions");
-  const now = new Date().toISOString();
-  const docRef = await addDoc(collRef, cleanPayload({
-    title,
-    createdAt: now,
-    updatedAt: now,
-    lastMessageSnippet: "Session started"
-  }));
-  return docRef.id;
-}
-
-export async function saveChatMessage(
-  userId: string, 
-  sessionId: string, 
-  message: Omit<ChatMessage, "id">
-) {
-  const collRef = collection(db, "users", userId, "chat_sessions", sessionId, "messages");
-  const docRef = await addDoc(collRef, cleanPayload(message));
-  
-  // Update session metadata
-  const sessionRef = doc(db, "users", userId, "chat_sessions", sessionId);
-  await setDoc(sessionRef, cleanPayload({
-    updatedAt: message.timestamp,
-    lastMessageSnippet: message.content.substring(0, 80) + (message.content.length > 80 ? "..." : "")
-  }), { merge: true });
-
-  return docRef.id;
 }

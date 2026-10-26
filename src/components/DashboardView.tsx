@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { 
   ArrowDownCircle, 
   ArrowUpCircle, 
@@ -10,18 +10,27 @@ import {
   CheckCircle2, 
   ChevronRight, 
   Plus, 
-  Brain,
-  ShieldCheck,
   Calendar,
-  IndianRupee
+  IndianRupee,
+  Search,
+  X,
+  Filter,
+  SlidersHorizontal,
+  Edit3,
+  Trash2,
+  RotateCcw
 } from "lucide-react";
 import { 
   IncomeEntry, 
   ExpenseEntry, 
-  BudgetStatus, 
-  FinancialAuditReport 
+  BudgetStatus 
 } from "../types";
-import { getCategoryMeta, getIncomeSourceMeta } from "../data/categories";
+import { 
+  EXPENSE_CATEGORIES, 
+  INCOME_SOURCES, 
+  getCategoryMeta, 
+  getIncomeSourceMeta 
+} from "../data/categories";
 
 interface DashboardViewProps {
   selectedMonth: string;
@@ -32,17 +41,12 @@ interface DashboardViewProps {
   totalExpenses: number;
   netSavings: number;
   savingsRate: number;
-  aiAudit: FinancialAuditReport | null;
-  isLoadingAudit: boolean;
-  onRefreshAudit: () => void;
   onOpenAddModal: (type: "expense" | "income" | "budget") => void;
   onNavigateTab: (tab: string) => void;
   onEditExpense: (expense: ExpenseEntry) => void;
   onEditIncome: (income: IncomeEntry) => void;
   onDeleteExpense: (id: string) => void;
   onDeleteIncome: (id: string) => void;
-  onSeedDemoData?: () => void;
-  isSeedingDemo?: boolean;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -54,27 +58,84 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   totalExpenses,
   netSavings,
   savingsRate,
-  aiAudit,
-  isLoadingAudit,
-  onRefreshAudit,
   onOpenAddModal,
   onNavigateTab,
   onEditExpense,
   onEditIncome,
   onDeleteExpense,
   onDeleteIncome,
-  onSeedDemoData,
-  isSeedingDemo = false,
 }) => {
   // Format month name
   const [year, month] = selectedMonth.split("-").map(Number);
   const monthName = new Date(year, month - 1, 1).toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
-  // Combined recent transactions
-  const combinedTransactions = [
-    ...expenses.map(e => ({ ...e, type: "expense" as const })),
-    ...incomes.map(i => ({ ...i, type: "income" as const })),
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8);
+  // Search & Filter state for transactions
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState<string>("all");
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState<"all" | "expense" | "income">("all");
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
+  // Combined all transactions
+  const allCombinedTransactions = useMemo(() => {
+    return [
+      ...expenses.map(e => ({ ...e, type: "expense" as const })),
+      ...incomes.map(i => ({ ...i, type: "income" as const })),
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [expenses, incomes]);
+
+  // Filtered transactions based on search and category
+  const filteredTransactions = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return allCombinedTransactions.filter((tx) => {
+      const isExp = tx.type === "expense";
+      const catOrSource = isExp ? (tx as ExpenseEntry).category : (tx as IncomeEntry).source;
+      const subCat = (tx as any).category || "";
+      const notes = tx.notes || "";
+      const tag = (tx as any).tag || "";
+      const paymentMethod = (tx as any).paymentMethod || "";
+      const amountStr = tx.amount.toString();
+      const dateStr = tx.date;
+
+      // Filter by Type
+      if (selectedTypeFilter !== "all" && tx.type !== selectedTypeFilter) {
+        return false;
+      }
+
+      // Filter by Category or Source
+      if (selectedFilterCategory !== "all") {
+        if (catOrSource !== selectedFilterCategory && subCat !== selectedFilterCategory) {
+          return false;
+        }
+      }
+
+      // Filter by Search Query
+      if (q) {
+        const matches = 
+          notes.toLowerCase().includes(q) ||
+          catOrSource.toLowerCase().includes(q) ||
+          subCat.toLowerCase().includes(q) ||
+          tag.toLowerCase().includes(q) ||
+          paymentMethod.toLowerCase().includes(q) ||
+          dateStr.includes(q) ||
+          amountStr.includes(q);
+        if (!matches) return false;
+      }
+
+      return true;
+    });
+  }, [allCombinedTransactions, searchQuery, selectedFilterCategory, selectedTypeFilter]);
+
+  // Whether active filtering is engaged
+  const isFiltering = searchQuery.trim().length > 0 || selectedFilterCategory !== "all" || selectedTypeFilter !== "all";
+
+  // Sliced transactions to display (show all if filtering or user clicked show all)
+  const displayedTransactions = useMemo(() => {
+    if (isFiltering || showAllTransactions) {
+      return filteredTransactions;
+    }
+    return filteredTransactions.slice(0, 8);
+  }, [filteredTransactions, isFiltering, showAllTransactions]);
 
   // Top spending category
   const categoryTotals: Record<string, number> = {};
@@ -128,34 +189,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Demo Data Callout Banner if no records exist */}
-      {incomes.length === 0 && expenses.length === 0 && onSeedDemoData && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[#C6B9E0]/20 via-[#7ED4C9]/20 to-[#FFB7A5]/20 border border-[#7ED4C9]/50 rounded-3xl shadow-xs">
-          <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-white border border-[#7ED4C9]/40 flex items-center justify-center text-[#6B5A96] shrink-0 shadow-2xs">
-              <Sparkles className="w-5 h-5 text-[#6B5A96]" />
-            </div>
-            <div>
-              <h3 className="text-sm font-extrabold text-slate-900">
-                New to Aura Money? Load Sample Financial Records
-              </h3>
-              <p className="text-xs text-slate-600 mt-0.5">
-                Populate your Cloud Firestore database with realistic income, expense categories (₹), and budget limits across the last 3 months.
-              </p>
-            </div>
-          </div>
-          <button
-            id="dash-seed-demo-banner-btn"
-            onClick={onSeedDemoData}
-            disabled={isSeedingDemo}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#7ED4C9] to-[#4AA89E] hover:from-[#5BC0BE] hover:to-[#358E85] text-slate-900 font-extrabold rounded-2xl text-xs shadow-sm transition-all active:scale-95 cursor-pointer border border-[#4AA89E]/40 shrink-0 disabled:opacity-60"
-          >
-            <Sparkles className="w-4 h-4 text-slate-900" />
-            <span>{isSeedingDemo ? "Seeding Records..." : "✨ Load Demo Financial Data"}</span>
-          </button>
-        </div>
-      )}
 
       {/* Primary KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -232,74 +265,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <p className="text-[11px] text-slate-500 font-medium mt-1">
               Target: 20%+ recommended
             </p>
-          </div>
-        </div>
-      </div>
-
-      {/* AI Financial Advisor Insight Banner */}
-      <div className="bg-white border border-[#7ED4C9]/35 rounded-3xl p-6 shadow-xs relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-aura-soft rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
-        
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-[#7ED4C9]/25 text-[#358E85] text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 border border-[#7ED4C9]/40">
-                <Brain className="w-3.5 h-3.5 text-[#4AA89E]" />
-                Gemini 3.6 Flash Advisor
-              </span>
-              {aiAudit?.status && (
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                  aiAudit.status === "Healthy" 
-                    ? "bg-[#7ED4C9]/20 text-[#358E85] border-[#7ED4C9]/40"
-                    : "bg-[#FFB7A5]/25 text-[#E07A5F] border-[#FFB7A5]/40"
-                }`}>
-                  Status: {aiAudit.status}
-                </span>
-              )}
-            </div>
-            
-            <h3 className="text-lg font-bold text-slate-900">
-              {aiAudit?.headline || "Real-Time AI Spending Assessment"}
-            </h3>
-
-            <p className="text-xs text-slate-600 leading-relaxed">
-              {aiAudit?.actionableTip || "Ask your AI advisor in the bottom-right for instant personalized budget recommendations or question specific expenses."}
-            </p>
-
-            {aiAudit?.keyHighlights && aiAudit.keyHighlights.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-                {aiAudit.keyHighlights.slice(0, 2).map((highlight, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-xs text-slate-600 font-medium">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#4AA89E] shrink-0" />
-                    <span>{highlight}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-            <button
-              id="refresh-ai-audit-btn"
-              onClick={onRefreshAudit}
-              disabled={isLoadingAudit}
-              className="px-4 py-2.5 bg-[#FBF7F0] hover:bg-white text-slate-700 border border-[#7ED4C9]/35 rounded-2xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer shadow-2xs"
-            >
-              {isLoadingAudit ? "Analyzing..." : "Re-run AI Audit"}
-            </button>
-            <button
-              id="open-advisor-chat-btn"
-              onClick={() => {
-                const trigger = document.getElementById("aura-chatbot-trigger-btn");
-                if (trigger) trigger.click();
-              }}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#FF9A8B] to-[#FFB7A5] hover:from-[#F38573] hover:to-[#FF9A8B] text-slate-900 font-extrabold rounded-2xl text-xs shadow-sm transition-all active:scale-95 cursor-pointer border border-[#FF9A8B]/60"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-slate-900" />
-              <span>Ask AI Chatbot</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-900" />
-            </button>
           </div>
         </div>
       </div>
@@ -444,21 +409,107 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* Recent Activity Feed */}
-      <div className="bg-white border border-[#7ED4C9]/35 rounded-3xl p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
+      {/* Global Search & Category Filter Bar with Transactions Table */}
+      <div className="bg-white border border-[#7ED4C9]/35 rounded-3xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
               <Calendar className="w-4 h-4 text-[#358E85]" />
-              Recent Financial Transactions
+              <span>Financial Transactions &amp; Activity</span>
             </h3>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Latest logged incomes and expenses
+              Quickly find transactions by description, note, category, or payment method
             </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500">
+              Showing {displayedTransactions.length} of {allCombinedTransactions.length}
+            </span>
+            {isFiltering && (
+              <button
+                id="dash-reset-filters-btn"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedFilterCategory("all");
+                  setSelectedTypeFilter("all");
+                }}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-extrabold text-[#358E85] bg-[#7ED4C9]/15 hover:bg-[#7ED4C9]/30 transition-colors cursor-pointer"
+                title="Reset all filters"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset</span>
+              </button>
+            )}
           </div>
         </div>
 
-        {combinedTransactions.length === 0 ? (
+        {/* Search & Category Filter Controls */}
+        <div className="bg-[#FBF7F0] border border-[#7ED4C9]/30 rounded-2xl p-3 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              id="dash-search-input"
+              type="text"
+              placeholder="Search by description, note, category, payment method, amount..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-[#7ED4C9]/40 focus:border-[#4AA89E] focus:ring-1 focus:ring-[#4AA89E] rounded-xl py-2 pl-10 pr-9 text-xs font-semibold text-slate-900 placeholder-slate-400 outline-none transition-all shadow-2xs"
+            />
+            {searchQuery && (
+              <button
+                id="dash-clear-search-btn"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+            {/* Type Selector */}
+            <select
+              id="dash-type-filter"
+              value={selectedTypeFilter}
+              onChange={(e) => setSelectedTypeFilter(e.target.value as any)}
+              className="bg-white border border-[#7ED4C9]/40 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-[#4AA89E] cursor-pointer shadow-2xs"
+            >
+              <option value="all">All Types</option>
+              <option value="expense">Expenses Only</option>
+              <option value="income">Incomes Only</option>
+            </select>
+
+            {/* Category / Source Selector */}
+            <select
+              id="dash-category-filter"
+              value={selectedFilterCategory}
+              onChange={(e) => setSelectedFilterCategory(e.target.value)}
+              className="bg-white border border-[#7ED4C9]/40 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-[#4AA89E] cursor-pointer shadow-2xs max-w-[200px] truncate"
+            >
+              <option value="all">All Categories &amp; Sources</option>
+              <optgroup label="Expense Categories">
+                {EXPENSE_CATEGORIES.map((c) => (
+                  <option key={`exp-${c.name}`} value={c.name}>
+                    {c.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Income Sources">
+                {INCOME_SOURCES.map((s) => (
+                  <option key={`inc-${s.name}`} value={s.name}>
+                    {s.name}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        {allCombinedTransactions.length === 0 ? (
           <div className="py-10 text-center bg-[#FBF7F0]/70 rounded-2xl border border-dashed border-[#7ED4C9]/40">
             <p className="text-xs text-slate-500">No financial transactions logged yet for this month.</p>
             <div className="mt-3 flex items-center justify-center gap-2">
@@ -476,72 +527,159 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </button>
             </div>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-[#7ED4C9]/20 bg-[#FBF7F0]/60 text-slate-600 font-bold">
-                  <th className="py-3.5 pl-4">Type</th>
-                  <th className="py-3.5">Source / Category</th>
-                  <th className="py-3.5">Date</th>
-                  <th className="py-3.5">Method / Notes</th>
-                  <th className="py-3.5 text-right pr-4">Amount</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {combinedTransactions.map((tx) => {
-                  const isExp = tx.type === "expense";
-                  const meta = isExp 
-                    ? getCategoryMeta((tx as ExpenseEntry).category)
-                    : getIncomeSourceMeta((tx as IncomeEntry).source);
-                  const Icon = meta.icon;
-
-                  return (
-                    <tr key={tx.id} className="hover:bg-[#FBF7F0]/80 transition-colors">
-                      <td className="py-3.5 pl-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${
-                          isExp ? "bg-[#FFB7A5]/25 text-[#E07A5F] border-[#FFB7A5]/40" : "bg-[#7ED4C9]/20 text-[#358E85] border-[#7ED4C9]/40"
-                        }`}>
-                          {isExp ? "Expense" : "Income"}
-                        </span>
-                      </td>
-                      <td className="py-3.5">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`p-1.5 rounded-xl ${meta.bgColor} ${meta.color}`}>
-                            <Icon className="w-3.5 h-3.5" />
-                          </div>
-                          <span className="font-extrabold text-slate-800">
-                            {isExp ? (tx as ExpenseEntry).category : (tx as IncomeEntry).source}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-3.5 text-slate-500 font-medium">
-                        {tx.date}
-                      </td>
-                      <td className="py-3.5 text-slate-500">
-                        {isExp ? (
-                          <span className="text-[11px] font-medium">
-                            {(tx as ExpenseEntry).paymentMethod}
-                            {tx.notes ? ` • ${tx.notes}` : ""}
-                          </span>
-                        ) : (
-                          <span className="text-[11px] font-medium">
-                            {(tx as IncomeEntry).isRecurring ? "Recurring" : "Direct"}
-                            {tx.notes ? ` • ${tx.notes}` : ""}
-                          </span>
-                        )}
-                      </td>
-                      <td className={`py-3.5 text-right pr-4 font-black text-sm ${
-                        isExp ? "text-[#E07A5F]" : "text-[#358E85]"
-                      }`}>
-                        {isExp ? "-" : "+"}₹{tx.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        ) : filteredTransactions.length === 0 ? (
+          <div className="py-12 text-center bg-[#FBF7F0]/60 rounded-2xl border border-dashed border-[#7ED4C9]/40">
+            <div className="w-10 h-10 rounded-2xl bg-[#7ED4C9]/20 text-[#358E85] border border-[#7ED4C9]/40 flex items-center justify-center mx-auto mb-2.5">
+              <Search className="w-5 h-5 text-[#358E85]" />
+            </div>
+            <h4 className="text-xs font-extrabold text-slate-800">No matching transactions found</h4>
+            <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
+              No transactions match your query &quot;{searchQuery}&quot; {selectedFilterCategory !== "all" ? `in ${selectedFilterCategory}` : ""}.
+            </p>
+            <button
+              id="dash-clear-search-empty-btn"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedFilterCategory("all");
+                setSelectedTypeFilter("all");
+              }}
+              className="mt-3 px-3.5 py-1.5 bg-[#7ED4C9]/20 hover:bg-[#7ED4C9]/35 text-[#358E85] border border-[#7ED4C9]/40 rounded-xl text-xs font-extrabold transition-all cursor-pointer"
+            >
+              Reset Search &amp; Filters
+            </button>
           </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#7ED4C9]/20 bg-[#FBF7F0]/60 text-slate-600 font-bold">
+                    <th className="py-3.5 pl-4">Type</th>
+                    <th className="py-3.5">Source / Category</th>
+                    <th className="py-3.5">Date</th>
+                    <th className="py-3.5">Method / Description</th>
+                    <th className="py-3.5 text-right">Amount</th>
+                    <th className="py-3.5 text-right pr-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {displayedTransactions.map((tx) => {
+                    const isExp = tx.type === "expense";
+                    const meta = isExp 
+                      ? getCategoryMeta((tx as ExpenseEntry).category)
+                      : getIncomeSourceMeta((tx as IncomeEntry).source);
+                    const Icon = meta.icon;
+
+                    return (
+                      <tr key={tx.id} className="hover:bg-[#FBF7F0]/80 transition-colors group">
+                        <td className="py-3.5 pl-4">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                            isExp ? "bg-[#FFB7A5]/25 text-[#E07A5F] border-[#FFB7A5]/40" : "bg-[#7ED4C9]/20 text-[#358E85] border-[#7ED4C9]/40"
+                          }`}>
+                            {isExp ? "Expense" : "Income"}
+                          </span>
+                        </td>
+                        <td className="py-3.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`p-1.5 rounded-xl ${meta.bgColor} ${meta.color}`}>
+                              <Icon className="w-3.5 h-3.5" />
+                            </div>
+                            <span className="font-extrabold text-slate-800">
+                              {isExp ? (tx as ExpenseEntry).category : (tx as IncomeEntry).source}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 text-slate-500 font-medium">
+                          {tx.date}
+                        </td>
+                        <td className="py-3.5 text-slate-500 max-w-xs truncate">
+                          {isExp ? (
+                            <span className="text-[11px] font-medium">
+                              {(tx as ExpenseEntry).paymentMethod}
+                              {tx.notes ? ` • ${tx.notes}` : ""}
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-medium">
+                              {(tx as IncomeEntry).isRecurring ? "Recurring" : "Direct"}
+                              {tx.notes ? ` • ${tx.notes}` : ""}
+                            </span>
+                          )}
+                        </td>
+                        <td className={`py-3.5 text-right font-black text-sm ${
+                          isExp ? "text-[#E07A5F]" : "text-[#358E85]"
+                        }`}>
+                          {isExp ? "-" : "+"}₹{tx.amount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="py-3.5 text-right pr-4">
+                          {deleteConfirmId === tx.id ? (
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => {
+                                  if (isExp) {
+                                    onDeleteExpense(tx.id);
+                                  } else {
+                                    onDeleteIncome(tx.id);
+                                  }
+                                  setDeleteConfirmId(null);
+                                }}
+                                className="px-2 py-1 bg-[#FF9A8B] hover:bg-[#F38573] text-slate-900 rounded-xl text-[10px] font-extrabold cursor-pointer"
+                              >
+                                Confirm
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="px-2 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-[10px] cursor-pointer"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-end gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => {
+                                  if (isExp) {
+                                    onEditExpense(tx as ExpenseEntry);
+                                  } else {
+                                    onEditIncome(tx as IncomeEntry);
+                                  }
+                                }}
+                                className="p-1.5 hover:bg-[#FBF7F0] rounded-xl text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
+                                title="Edit Transaction"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(tx.id)}
+                                className="p-1.5 hover:bg-[#FFB7A5]/20 rounded-xl text-slate-400 hover:text-[#E07A5F] transition-colors cursor-pointer"
+                                title="Delete Transaction"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Toggle show all transactions if list is long and not filtering */}
+            {!isFiltering && filteredTransactions.length > 8 && (
+              <div className="text-center pt-2 border-t border-[#7ED4C9]/20">
+                <button
+                  id="dash-toggle-show-all-btn"
+                  onClick={() => setShowAllTransactions(!showAllTransactions)}
+                  className="text-xs font-bold text-[#358E85] hover:text-[#4AA89E] cursor-pointer transition-colors"
+                >
+                  {showAllTransactions
+                    ? "Show less (recent 8)"
+                    : `Show all ${filteredTransactions.length} transactions`}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

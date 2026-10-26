@@ -1,23 +1,21 @@
 import React, { useState } from "react";
 import { 
   ShieldCheck, 
-  Sparkles, 
   ArrowRight, 
   TrendingUp, 
   PieChart, 
   Lock, 
   CheckCircle,
-  Brain,
   Database,
-  Coins
+  Coins,
+  BarChart3
 } from "lucide-react";
 
 interface LandingPageProps {
   onSignIn: () => Promise<void>;
-  onExploreDemo?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDemo }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +37,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDem
       {/* Top Banner */}
       <div className="border-b border-[#7ED4C9]/30 bg-white/80 backdrop-blur-sm px-4 py-2.5 text-center text-xs text-slate-600 flex items-center justify-center gap-2">
         <span className="flex h-2 w-2 rounded-full bg-[#4AA89E] animate-pulse" />
-        <span>Aura • <strong>See your money's energy</strong> with <strong>Cloud Firestore</strong> &amp; <strong>Gemini 3.6 Flash</strong></span>
+        <span>Aura • <strong>See your money's energy</strong> with <strong>Cloud Firestore</strong> &amp; <strong>Calm Financial Clarity</strong></span>
       </div>
 
       {/* Main Hero Container */}
@@ -70,8 +68,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDem
         </h1>
 
         <p className="mt-6 text-base md:text-lg text-slate-600 max-w-2xl leading-relaxed">
-          Log incomes, categorize expenses, track monthly budgets, and converse with
-          your dedicated <strong>Aura AI Chatbot</strong> in the bottom-right corner to balance your cashflow peacefully.
+          Log incomes, categorize expenses, track monthly budgets, and analyze spending trends with calm clarity to balance your cashflow peacefully.
         </p>
 
         {/* Google Sign In Call to Action */}
@@ -106,17 +103,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDem
             )}
             <span>{isLoading ? "Signing In with Google..." : "Continue with Google Sign-In"}</span>
           </button>
-
-          {onExploreDemo && (
-            <button
-              id="explore-demo-btn"
-              onClick={onExploreDemo}
-              className="w-full flex items-center justify-center gap-2 bg-[#C6B9E0]/25 hover:bg-[#C6B9E0]/40 text-[#6B5A96] border border-[#C6B9E0]/60 font-extrabold px-6 py-3 rounded-2xl transition-all active:scale-98 cursor-pointer text-xs shadow-2xs"
-            >
-              <Sparkles className="w-4 h-4 text-[#6B5A96]" />
-              <span>✨ Explore Live Interactive Demo (Sample Data)</span>
-            </button>
-          )}
 
           {error && (
             <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl w-full text-left">
@@ -155,11 +141,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDem
 
           <div className="bg-white border border-[#FFB7A5]/40 rounded-3xl p-5 shadow-xs hover:border-[#FF9A8B]/70 transition-all">
             <div className="w-10 h-10 rounded-2xl bg-[#FFB7A5]/25 text-[#E07A5F] flex items-center justify-center mb-3 border border-[#FFB7A5]/50">
-              <Brain className="w-5 h-5" />
+              <BarChart3 className="w-5 h-5" />
             </div>
-            <h3 className="font-extrabold text-slate-900 text-sm">Aura AI Chatbot</h3>
+            <h3 className="font-extrabold text-slate-900 text-sm">Visual Reports &amp; Trends</h3>
             <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-              Ask natural language questions about your spending and get actionable money-saving strategies.
+              Analyze cashflow distributions, daily cumulative spending trajectory, and export CSV spreadsheets.
             </p>
           </div>
 
@@ -187,7 +173,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDem
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-3.5 h-3.5 text-[#4AA89E] shrink-0" />
-              <span>Server-side Gemini fallback ladder</span>
+              <span>Direct authenticated data persistence</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-3.5 h-3.5 text-[#4AA89E] shrink-0" />
@@ -195,7 +181,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onSignIn, onExploreDem
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-3.5 h-3.5 text-[#4AA89E] shrink-0" />
-              <span>Multi-turn consultation persistence</span>
+              <span>Real-time budget adherence alerts</span>
             </div>
           </div>
         </div>

@@ -1,0 +1,740 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>Aura Money - Second Review Project Report</title>
+<style>
+  body {
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #1E293B;
+    margin: 1in;
+  }
+  h1 {
+    font-size: 22pt;
+    color: #0F172A;
+    border-bottom: 2pt solid #4AA89E;
+    padding-bottom: 6px;
+    margin-top: 24pt;
+    margin-bottom: 12pt;
+  }
+  h2 {
+    font-size: 15pt;
+    color: #2D3748;
+    border-bottom: 1pt solid #CBD5E1;
+    padding-bottom: 4px;
+    margin-top: 18pt;
+    margin-bottom: 8pt;
+  }
+  h3 {
+    font-size: 12pt;
+    color: #334155;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    text-align: justify;
+  }
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    padding-left: 24pt;
+  }
+  li {
+    margin-bottom: 4pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10pt;
+    margin-bottom: 14pt;
+    font-size: 10pt;
+  }
+  th {
+    background-color: #E2F1EF;
+    color: #134E48;
+    font-weight: bold;
+    text-align: left;
+    padding: 8pt;
+    border: 1pt solid #CBD5E1;
+  }
+  td {
+    padding: 7pt;
+    border: 1pt solid #CBD5E1;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background-color: #F8FAFC;
+  }
+  .title-block {
+    text-align: center;
+    border-bottom: 3pt double #4AA89E;
+    padding-bottom: 18pt;
+    margin-bottom: 24pt;
+  }
+  .title-block h1 {
+    font-size: 26pt;
+    color: #0F172A;
+    border: none;
+    margin-bottom: 4pt;
+  }
+  .title-block .subtitle {
+    font-size: 14pt;
+    color: #4AA89E;
+    font-weight: bold;
+    margin-bottom: 12pt;
+  }
+  .title-block .meta {
+    font-size: 10.5pt;
+    color: #64748B;
+  }
+  .uml-box {
+    background-color: #F1F5F9;
+    border: 1pt solid #94A3B8;
+    padding: 10pt;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    margin: 10pt 0;
+    white-space: pre;
+  }
+  .badge-pass {
+    display: inline-block;
+    padding: 2pt 6pt;
+    background-color: #DCFCE7;
+    color: #166534;
+    border-radius: 4pt;
+    font-weight: bold;
+    font-size: 9pt;
+  }
+  .badge-tech {
+    display: inline-block;
+    padding: 2pt 6pt;
+    background-color: #E0F2FE;
+    color: #075985;
+    border-radius: 4pt;
+    font-weight: bold;
+    font-size: 9pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>AURA MONEY</h1>
+  <div class="subtitle">Cloud-Enabled Personal Financial Management &amp; Analytical Wealth System</div>
+  <div class="meta">
+    <strong>Project Review:</strong> Second Review Phase &nbsp;|&nbsp;
+    <strong>Application Architecture:</strong> React 18, TypeScript, Tailwind CSS, Cloud Firestore, Firebase Authentication &nbsp;|&nbsp;
+    <strong>Author / Lead:</strong> Ashwitha Rao
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 1. DESIGN                                                                 -->
+<!-- ========================================================================= -->
+<h1>1. Design</h1>
+
+<h2>1.1 Architectural Design</h2>
+<p>
+  The system architecture of <strong>Aura Money</strong> follows a <strong>Clean Component-Driven Single-Page Architecture (SPA)</strong> integrated with a <strong>Serverless Backend-as-a-Service (BaaS)</strong> layer powered by Google Cloud Firestore and Firebase Authentication. This pattern achieves clear separation of concerns between presentation, reactive state coordination, domain business logic, and cloud persistence.
+</p>
+<p>
+  The client-side architecture is structured into four primary logical tiers:
+</p>
+<ol>
+  <li><strong>Presentation Tier:</strong> React 18 view components (`DashboardView`, `IncomeView`, `ExpensesView`, `BudgetView`, `ReportsView`, `Navbar`, and entry modals) styled with atomic utility classes via Tailwind CSS.</li>
+  <li><strong>State &amp; Controller Tier:</strong> Reactive custom hooks (`useFinanceData`, `useAuth`) that manage user sessions, coordinate Firestore real-time snapshot subscriptions, and emit state updates.</li>
+  <li><strong>Domain &amp; Analytics Tier:</strong> Strict TypeScript computation pipelines that derive real-time budget variances, daily trajectories, 12-month annual cashflows, and cumulative savings without mutating core models.</li>
+  <li><strong>Data Persistence &amp; Security Tier:</strong> Cloud Firestore distributed document store guarded by granular owner-bound security rules (`firestore.rules`) and federated identity token verification.</li>
+</ol>
+
+<div class="uml-box">
++---------------------------------------------------------------------------------------+
+|                               AURA MONEY ARCHITECTURE                                 |
++---------------------------------------------------------------------------------------+
+                                           |
+                                [Client Browser Runtime]
+                                           |
+  +----------------------------------------------------------------------------------+
+  |                                PRESENTATION TIER                                 |
+  |  +---------------+  +---------------+  +---------------+  +-------------------+  |
+  |  | DashboardView |  |  IncomeView   |  | ExpensesView  |  | ReportsView (12M) |  |
+  |  +---------------+  +---------------+  +---------------+  +-------------------+  |
+  |  |  BudgetView   |  | Navbar / Nav  |  | Entry Modals  |  | Visual Charts     |  |
+  |  +---------------+  +---------------+  +---------------+  +-------------------+  |
+  +----------------------------------------------------------------------------------+
+                                           |
+                                [Reactive Data Flow]
+                                           v
+  +----------------------------------------------------------------------------------+
+  |                          STATE &amp; DOMAIN LOGIC TIER                               |
+  |  +------------------------------------+  +------------------------------------+  |
+  |  |     Custom Hooks (useFinanceData)  |  |     Aggregation &amp; Trend Selectors  |  |
+  |  |  - Firestore snapshot subscriptions|  |  - 12-Month cashflow matrix        |  |
+  |  |  - Optimistic client updates       |  |  - Category budget variance engine |  |
+  |  +------------------------------------+  +------------------------------------+  |
+  |  +------------------------------------+  +------------------------------------+  |
+  |  |      Authentication Context        |  |      CSV Sanitization Engine       |  |
+  |  |  - Firebase Google SSO Listener    |  |  - RFC 4180 Formula Shield        |  |
+  |  +------------------------------------+  +------------------------------------+  |
+  +----------------------------------------------------------------------------------+
+                                           |
+                           [Secure Transport: HTTPS / WSS]
+                                           v
+  +----------------------------------------------------------------------------------+
+  |                         PERSISTENCE &amp; CLOUD SECURITY                             |
+  |  +------------------------------------+  +------------------------------------+  |
+  |  |        Firebase Authentication     |  |          Cloud Firestore           |  |
+  |  |  - Federated JWT Tokens (GSI)      |  |  - Subcollections: /users/{uid}/.. |  |
+  |  |  - Session Persistence             |  |  - Owner-bound Security Rules      |  |
+  |  +------------------------------------+  +------------------------------------+  |
+  +----------------------------------------------------------------------------------+
+</div>
+
+<h2>1.2 Detailed Design &amp; UML Models</h2>
+
+<h3>1.2.1 Component Interaction Architecture</h3>
+<p>
+  The view layer avoids global state bloat by maintaining unidirectional data flow. Top-level state flows down as immutable props, while child components trigger mutations via strongly-typed callbacks.
+</p>
+<div class="uml-box">
+  +---------------------------------------------------------------------+
+  |                               App.tsx                               |
+  |   - Holds current user state, selectedMonth, selectedView           |
+  |   - Consumes useFinanceData(user, selectedMonth)                    |
+  +---------------------------------------------------------------------+
+        |                     |                   |                 |
+        v                     v                   v                 v
+  +------------+       +-------------+     +-------------+    +---------------+
+  | Navbar.tsx |       |DashboardView|     | BudgetView  |    |ReportsView.tsx|
+  | - MonthNav |       | - KPI Cards |     | - Progress  |    | - 12-Mo Bar   |
+  | - ViewTabs |       | - Donut SVG |     | - Variance  |    | - Yearly CSV  |
+  | - Drawer   |       | - Trajectory|     | - Overspend |    | - Monthly CSV |
+  +------------+       +-------------+     +-------------+    +---------------+
+</div>
+
+<h3>1.2.2 State Machine Diagram: Category Budget Lifecycle</h3>
+<p>
+  Each expense category dynamically transitions across deterministic operational states based on the budget consumption equation: <em>Utilization % = (Spent / Limit) * 100</em>.
+</p>
+<div class="uml-box">
+             +------------------+
+             |    [Initial]     |
+             | No Budget Limit  |
+             +------------------+
+                      |
+                      | Set Monthly Limit (limit > 0)
+                      v
+             +------------------+
+             |   UNDER_BUDGET   |<-----------------------+
+             |  (Spend < 90%)   |                        |
+             |   Color: Emerald |                        |
+             +------------------+                        |
+                      |                                  |
+                      | Log Expense (90% <= Spend < 100%)| Expense Deleted
+                      v                                  | or Limit Increased
+             +------------------+                        |
+             |   NEAR_LIMIT     |------------------------+
+             | (90% - 99.9% Usg)|                        |
+             |   Color: Amber   |                        |
+             +------------------+                        |
+                      |                                  |
+                      | Log Expense (Spend >= 100%)      |
+                      v                                  |
+             +------------------+                        |
+             |   OVER_BUDGET    |------------------------+
+             | (Spend >= Limit) |
+             |   Color: Crimson |
+             +------------------+
+</div>
+
+<h2>1.3 Design Decisions &amp; Trade-Off Studies</h2>
+
+<h3>Trade-Off Study 1: Persistence Layer — Cloud Firestore vs. Relational Database (PostgreSQL)</h3>
+<table>
+  <tr>
+    <th>Criteria</th>
+    <th>Cloud Firestore (Selected)</th>
+    <th>PostgreSQL / Cloud SQL</th>
+    <th>Decision Rationale</th>
+  </tr>
+  <tr>
+    <td><strong>Data Model</strong></td>
+    <td>Hierarchical Document Model (`/users/{uid}/...`)</td>
+    <td>Normalized Relational Tables with Foreign Keys</td>
+    <td>Personal finance records are naturally tenant-isolated. Path-based subcollections guarantee zero cross-user leakage.</td>
+  </tr>
+  <tr>
+    <td><strong>Real-Time Sync</strong></td>
+    <td>Native WebSocket Snapshot Listeners (`onSnapshot`)</td>
+    <td>Requires custom polling or server-side WebSockets</td>
+    <td>Firestore provides instant sub-second synchronization across multiple devices without custom socket servers.</td>
+  </tr>
+  <tr>
+    <td><strong>Cold Start &amp; Latency</strong></td>
+    <td>Near-zero cold start; distributed edge delivery</td>
+    <td>Connection pooling and server provisioning latency</td>
+    <td>Instant load times are essential for mobile quick-logging of expenses.</td>
+  </tr>
+  <tr>
+    <td><strong>Infrastructure Maintenance</strong></td>
+    <td>Serverless, zero-ops, automatic scaling</td>
+    <td>Requires connection sizing, migrations, DB maintenance</td>
+    <td>Firestore eliminates operational overhead while maintaining enterprise availability.</td>
+  </tr>
+</table>
+
+<h3>Trade-Off Study 2: Application Architecture — Client-Side SPA (Vite + React) vs. Server-Side Rendering (SSR / Next.js)</h3>
+<table>
+  <tr>
+    <th>Criteria</th>
+    <th>Client-Side SPA with Vite (Selected)</th>
+    <th>Full SSR Framework</th>
+    <th>Decision Rationale</th>
+  </tr>
+  <tr>
+    <td><strong>Interactive Latency</strong></td>
+    <td>Sub-millisecond chart re-renders and client filtering</td>
+    <td>Server round-trips for parameterized view toggling</td>
+    <td>Financial dashboards require immediate responsiveness when adjusting date sliders and chart filters.</td>
+  </tr>
+  <tr>
+    <td><strong>Security Boundary</strong></td>
+    <td>Direct SDK interaction authenticated via client JWTs</td>
+    <td>Server-side API session proxies with secret keys</td>
+    <td>Using Firebase Auth with rules-enforced Firestore access eliminates middleman API server vulnerabilities.</td>
+  </tr>
+  <tr>
+    <td><strong>Bundle &amp; Build Velocity</strong></td>
+    <td>Lightweight ES Module bundling (&lt; 3 seconds)</td>
+    <td>Complex Node runtime compilation &amp; SSR polyfills</td>
+    <td>Vite provides fast developer feedback and clean production asset distribution.</td>
+  </tr>
+</table>
+
+<h3>Trade-Off Study 3: Report Generation — Client-Side Streaming vs. Server-Side File Generation</h3>
+<p>
+  <strong>Decision:</strong> Aura Money implements a client-side RFC 4180 CSV engine directly in the browser using HTML5 Blob URLs.
+  <br><strong>Rationale:</strong> Generating CSV files on the client avoids transmitting sensitive transactional data to an external PDF/CSV microservice. It allows zero-latency downloads, functions offline from cached snapshots, and eliminates backend compute costs.
+</p>
+
+<h2>1.4 System Design (DFD &amp; UML Diagrams)</h2>
+
+<h3>1.4.1 Level-0 Context Data Flow Diagram (DFD)</h3>
+<div class="uml-box">
+  +------------------+         Transaction Ingestion Payload (Income/Expense/Budget)       +---------------------+
+  |                  |-------------------------------------------------------------------->|                     |
+  |                  |                                                                     |                     |
+  |                  |<--------------------------------------------------------------------|                     |
+  |                  |         Real-Time Dashboard Aggregates &amp; Visual Analytics           |                     |
+  |  AUTHENTICATED   |                                                                     |     AURA MONEY      |
+  |       USER       |-------------------------------------------------------------------->|     CORE SYSTEM     |
+  |                  |                  Authentication Credentials (Google SSO)            |                     |
+  |                  |                                                                     |                     |
+  |                  |<--------------------------------------------------------------------|                     |
+  |                  |         Standardized Annual / Monthly CSV Report Downloads          |                     |
+  +------------------+                                                                     +---------------------+
+                                                                                                |           ^
+                                                  Document Read / Write &amp; Real-time Snapshots   |           |
+                                                                                                v           |
+                                                                                           +---------------------+
+                                                                                           |   CLOUD FIRESTORE   |
+                                                                                           |    DATA STORE       |
+                                                                                           +---------------------+
+</div>
+
+<h3>1.4.2 Level-1 Detailed Data Flow Diagram (DFD)</h3>
+<div class="uml-box">
+[User Input] --> (1.0 Auth Controller) --------> [Firebase Auth Service]
+                         |
+                         v (Authenticated Session Context)
+[Transaction] -> (2.0 Payload Validator) ------> [Strip undefined &amp; sanitize]
+                         |
+                         v (Valid Entity)
+                 (3.0 Firestore Dispatcher) ---> [Firestore Document Database]
+                         |
+                         v (Snapshot Stream)
+                 (4.0 Aggregation Engine) ------> [Derive KPIs, 12M Cashflow, Variances]
+                         |
+                         +-------------> (5.0 View Renderer) ------> [Interactive UI / Charts]
+                         |
+                         +-------------> (6.0 CSV Formatter) ------> [Sanitized .CSV Download]
+</div>
+
+<h2>1.5 Database Design</h2>
+<p>
+  Cloud Firestore employs a schemaless NoSQL hierarchical collection structure. To enforce strict data isolation and zero cross-user visibility, all financial entities are stored under user-scoped subcollections:
+</p>
+
+<h3>1.5.1 Schema Definitions</h3>
+<table>
+  <tr>
+    <th>Collection Path</th>
+    <th>Field Name</th>
+    <th>Data Type</th>
+    <th>Description &amp; Constraints</th>
+  </tr>
+  <tr>
+    <td rowspan="7"><code>/users/{userId}/incomes/{incomeId}</code></td>
+    <td><code>id</code></td>
+    <td>String</td>
+    <td>Unique alphanumeric identifier.</td>
+  </tr>
+  <tr>
+    <td><code>userId</code></td>
+    <td>String</td>
+    <td>Matches authenticated Google UID.</td>
+  </tr>
+  <tr>
+    <td><code>date</code></td>
+    <td>String (ISO)</td>
+    <td>Transaction date formatted as `YYYY-MM-DD`.</td>
+  </tr>
+  <tr>
+    <td><code>source</code></td>
+    <td>String</td>
+    <td>Earning channel (Salary, Freelance, Investment, etc.).</td>
+  </tr>
+  <tr>
+    <td><code>amount</code></td>
+    <td>Number</td>
+    <td>Positive numerical currency value.</td>
+  </tr>
+  <tr>
+    <td><code>isRecurring</code></td>
+    <td>Boolean</td>
+    <td>Flag indicating monthly recurring deposit.</td>
+  </tr>
+  <tr>
+    <td><code>notes</code></td>
+    <td>String (Optional)</td>
+    <td>Contextual remarks or invoice reference.</td>
+  </tr>
+  <tr>
+    <td rowspan="7"><code>/users/{userId}/expenses/{expenseId}</code></td>
+    <td><code>id</code></td>
+    <td>String</td>
+    <td>Unique alphanumeric identifier.</td>
+  </tr>
+  <tr>
+    <td><code>userId</code></td>
+    <td>String</td>
+    <td>Matches authenticated Google UID.</td>
+  </tr>
+  <tr>
+    <td><code>date</code></td>
+    <td>String (ISO)</td>
+    <td>Transaction date formatted as `YYYY-MM-DD`.</td>
+  </tr>
+  <tr>
+    <td><code>category</code></td>
+    <td>String</td>
+    <td>Standard category key matching `EXPENSE_CATEGORIES`.</td>
+  </tr>
+  <tr>
+    <td><code>amount</code></td>
+    <td>Number</td>
+    <td>Positive numerical expenditure value.</td>
+  </tr>
+  <tr>
+    <td><code>paymentMethod</code></td>
+    <td>String</td>
+    <td>Instrument (UPI, Credit Card, Debit Card, Cash, etc.).</td>
+  </tr>
+  <tr>
+    <td><code>notes</code></td>
+    <td>String (Optional)</td>
+    <td>Contextual remarks or vendor name.</td>
+  </tr>
+  <tr>
+    <td rowspan="5"><code>/users/{userId}/budgets/{budgetId}</code></td>
+    <td><code>id</code></td>
+    <td>String</td>
+    <td>Unique budget target identifier.</td>
+  </tr>
+  <tr>
+    <td><code>userId</code></td>
+    <td>String</td>
+    <td>Matches authenticated Google UID.</td>
+  </tr>
+  <tr>
+    <td><code>month</code></td>
+    <td>String</td>
+    <td>Target calendar period formatted as `YYYY-MM`.</td>
+  </tr>
+  <tr>
+    <td><code>category</code></td>
+    <td>String</td>
+    <td>Expense category being constrained.</td>
+  </tr>
+  <tr>
+    <td><code>limit</code></td>
+    <td>Number</td>
+    <td>Ceiling spending threshold in currency units.</td>
+  </tr>
+</table>
+
+<h3>1.5.2 Cloud Firestore Security Rules (`firestore.rules`)</h3>
+<p>
+  Access control is enforced at the database kernel level using non-bypassable security rules:
+</p>
+<div class="uml-box">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Lock down root documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Strict User-Bound Isolation Rules
+    match /users/{userId} {
+      allow read, write: if request.auth != null &amp;&amp; request.auth.uid == userId;
+
+      match /incomes/{incomeId} {
+        allow read, write: if request.auth != null &amp;&amp; request.auth.uid == userId;
+      }
+      match /expenses/{expenseId} {
+        allow read, write: if request.auth != null &amp;&amp; request.auth.uid == userId;
+      }
+      match /budgets/{budgetId} {
+        allow read, write: if request.auth != null &amp;&amp; request.auth.uid == userId;
+      }
+    }
+  }
+}
+</div>
+
+<!-- ========================================================================= -->
+<!-- 2. IMPLEMENTATION                                                         -->
+<!-- ========================================================================= -->
+<h1>2. Implementation</h1>
+
+<h2>2.1 Implementation Approach</h2>
+<p>
+  Aura Money employs a <strong>Reactive, Declarative Implementation Approach</strong> utilizing React 18 with TypeScript in strict mode (`tsc --noEmit`). State transitions are managed through pure functional components, hooks, and immutable state updaters. The UI is built using mobile-first, atomic utility classes provided by Tailwind CSS, eliminating secondary CSS stylesheet sprawl and ensuring sub-millisecond styling execution.
+</p>
+
+<h2>2.2 Software Reuse</h2>
+<p>
+  To maximize engineering velocity, reliability, and code hygiene, the codebase heavily leverages proven open-source foundations:
+</p>
+<ul>
+  <li><strong>Lucide React Icon Library:</strong> Reusable SVG vector iconography providing consistent semantic visual markers across navigation, category badges, and alert banners.</li>
+  <li><strong>Recharts Data Visualization Engine:</strong> Composable React chart components built on D3 scale geometry, supporting accessible responsive SVG containers (`ResponsiveContainer`, `BarChart`, `PieChart`, `AreaChart`).</li>
+  <li><strong>Shared Domain Contracts (`src/types.ts`):</strong> Centralized TypeScript interfaces reused across UI components, database synchronizers, and analytical aggregation functions.</li>
+  <li><strong>Category Design System (`src/data/categories.ts`):</strong> A single source of truth for color tokens, icon mappings, and human-readable metadata, preventing styling divergence.</li>
+</ul>
+
+<h2>2.3 Design Patterns Implemented</h2>
+<ul>
+  <li><strong>Observer / Subscription Pattern:</strong> Utilized via Firebase `onSnapshot` listeners to subscribe the client interface directly to Firestore document trees, streaming remote changes into local state with zero polling.</li>
+  <li><strong>Facade Pattern (`useFinanceData`):</strong> Encapsulates all Firestore data ingestion, document deletion, and optimistic client updates behind a clean, unified custom hook interface.</li>
+  <li><strong>Memoized Selector Pattern (`useMemo`):</strong> Prevents unnecessary re-computations of computationally heavy analytics (such as the 12-month cashflow matrix and daily cumulative trajectory) during unrelated UI re-renders.</li>
+  <li><strong>Portal Pattern (`createPortal`):</strong> Renders the full-height navigation drawer directly into `document.body`, escaping nested z-index clipping contexts and stacking constraints.</li>
+</ul>
+
+<h2>2.4 Special Coding Techniques</h2>
+
+<h3>2.4.1 RFC 4180 Formula Injection Shield</h3>
+<p>
+  To eliminate CSV Formula Injection risks (where malicious strings like `=1+1` execute arbitrary code when opened in spreadsheet software), all exported text cells pass through a defensive sanitization routine:
+</p>
+<div class="uml-box">
+const escapeCell = (val: string | number | undefined | null): string => {
+  if (val === undefined || val === null) return '""';
+  let str = String(val);
+  // Neutralize formula triggers: =, +, -, @, tab, carriage return
+  if (/^[=+@\-\t\r]/.test(str)) {
+    str = "'" + str; // Prepend apostrophe to force plain-text interpretation
+  }
+  return `"${str.replace(/"/g, '""')}"`; // Standard RFC 4180 double-quote escaping
+};
+</div>
+
+<h3>2.4.2 Zero-Crash Payload Hygiene (Undefined-Stripping)</h3>
+<p>
+  Cloud Firestore throws fatal runtime exceptions if any object property evaluates to `undefined`. A strict payload sanitization step strips undefined keys before database dispatch:
+</p>
+<div class="uml-box">
+const sanitizePayload = &lt;T extends object&gt;(obj: T): Partial&lt;T&gt; => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, v]) => v !== undefined)
+  ) as Partial&lt;T&gt;;
+};
+</div>
+
+<h3>2.4.3 UTF-8 Byte Order Mark (BOM) International Encoding</h3>
+<p>
+  When exporting reports containing non-ASCII symbols (such as Indian Rupee `₹` or Euro `€`), spreadsheet programs often corrupt the display without explicit character-set headers. Aura Money prepends `\uFEFF` to the file blob, ensuring crisp symbol rendering across all operating systems.
+</p>
+
+<!-- ========================================================================= -->
+<!-- 3. TESTING                                                                -->
+<!-- ========================================================================= -->
+<h1>3. Testing</h1>
+
+<h2>3.1 Testing Approach</h2>
+<p>
+  A multi-tier verification methodology guarantees stability across all layers of the stack:
+</p>
+<ul>
+  <li><strong>Static Type &amp; Compile-Time Verification:</strong> Enforced by TypeScript strict mode (`tsc --noEmit`) and ESLint to catch null dereferences, invalid prop assignments, and syntax errors.</li>
+  <li><strong>Deterministic Functional Walkthroughs:</strong> Systematic test scripts verifying every user interaction, form input, modal state, and database persistence round-trip.</li>
+  <li><strong>Cross-Breakpoint Ergonomic Testing:</strong> Verified responsiveness across desktop (&gt;=1024px), tablet (768px–1023px), and mobile (320px–767px) viewport widths.</li>
+  <li><strong>Export Validation:</strong> Hexadecimal and spreadsheet inspections of generated CSV files to verify RFC 4180 compliance and formula neutralization.</li>
+</ul>
+
+<h2>3.2 Sample Test Plans &amp; Execution Results</h2>
+
+<table>
+  <tr>
+    <th>Test ID</th>
+    <th>Test Scenario &amp; Objective</th>
+    <th>Input / Trigger</th>
+    <th>Expected Result</th>
+    <th>Status</th>
+  </tr>
+  <tr>
+    <td><strong>TC-AUTH-01</strong></td>
+    <td>Google SSO Federated Authentication</td>
+    <td>Click "Sign in with Google" button</td>
+    <td>Session tokens generated; user authenticated; private financial dashboard loads.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-TXN-01</strong></td>
+    <td>Record Income Entry</td>
+    <td>Amount: ₹75,000, Source: "Salary", Date: "2026-09-01", Recurring: true</td>
+    <td>Document created in Firestore; Total Inflow KPI increments immediately.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-TXN-02</strong></td>
+    <td>Record Categorized Expense</td>
+    <td>Amount: ₹4,200, Category: "Groceries", Method: "UPI"</td>
+    <td>Outflow recorded; category total updates; recent activity ledger reflects entry.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-BDG-01</strong></td>
+    <td>Budget Threshold Warning (90%)</td>
+    <td>Budget: ₹10,000. Current Spend: ₹9,200</td>
+    <td>Status transitions from Emerald to Amber Warning badge; progress bar indicates 92%.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-BDG-02</strong></td>
+    <td>Budget Deficit Alert (Over Budget)</td>
+    <td>Budget: ₹5,000. Add Expense: ₹5,800</td>
+    <td>Status transitions to Crimson Alert; displays exact deficit (+₹800 over limit).</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-ANL-01</strong></td>
+    <td>12-Month Annual Cashflow Aggregation</td>
+    <td>Switch Reports view to "Yearly" mode</td>
+    <td>Bar chart renders Jan–Dec comparison; annual totals match sum of individual months.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-CSV-01</strong></td>
+    <td>Annual Comprehensive CSV Export</td>
+    <td>Click "Export CSV" -&gt; Select "Full Year" -&gt; Download</td>
+    <td>Downloads `Comprehensive_Yearly_Financial_Report_2026.csv` with all 5 sections.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-CSV-02</strong></td>
+    <td>Formula Injection Neutralization</td>
+    <td>Note field: "=SUM(A1:A10)"</td>
+    <td>Output file prepends single quote (`'=SUM(A1:A10)'`); rendered as string in Excel.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+  <tr>
+    <td><strong>TC-NAV-01</strong></td>
+    <td>Single Scrollbar &amp; Body Lock</td>
+    <td>Open navigation drawer on mobile</td>
+    <td>Background body scroll locked; drawer uses full 100vh with single internal scroll track.</td>
+    <td><span class="badge-pass">PASSED</span></td>
+  </tr>
+</table>
+
+<!-- ========================================================================= -->
+<!-- 4. TOOLS AND TECHNOLOGIES                                                 -->
+<!-- ========================================================================= -->
+<h1>4. Tools and Technologies</h1>
+
+<p>
+  Aura Money integrates an advanced, modern web development stack selected for reliability, type safety, performance, and operational security:
+</p>
+
+<table>
+  <tr>
+    <th>Technology</th>
+    <th>Role in Project</th>
+    <th>Key Capability / Advantage</th>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">React 18</span></td>
+    <td>UI Framework</td>
+    <td>Concurrent rendering, declarative component tree, and efficient Virtual DOM reconciliation.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">TypeScript 5</span></td>
+    <td>Programming Language</td>
+    <td>Strict static type safety, end-to-end interface contracts, and compile-time error prevention.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Tailwind CSS</span></td>
+    <td>Styling Framework</td>
+    <td>Atomic utility-first CSS engine, responsive breakpoint modifiers, and minimal runtime bundle size.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Recharts &amp; D3</span></td>
+    <td>Data Visualization</td>
+    <td>Declarative SVG chart primitives, smooth interpolation animations, and responsive charting wrappers.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Cloud Firestore</span></td>
+    <td>Database-as-a-Service</td>
+    <td>Real-time document synchronization via WebSockets, automatic multi-region scaling, and security rules.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Firebase Auth</span></td>
+    <td>Identity &amp; Authentication</td>
+    <td>Secure Google Federated OAuth 2.0 Single Sign-On, JWT session verification, and token rotation.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Vite 6</span></td>
+    <td>Build Tool &amp; Dev Server</td>
+    <td>Native ES module serving, sub-second HMR updates, and highly optimized Rollup production bundling.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Lucide React</span></td>
+    <td>Vector Iconography</td>
+    <td>Tree-shakeable, clean, accessible SVG icons designed for modern user interfaces.</td>
+  </tr>
+  <tr>
+    <td><span class="badge-tech">Google Cloud Run</span></td>
+    <td>Deployment Platform</td>
+    <td>Serverless container execution, automated TLS certificate provisioning, and ingress management.</td>
+  </tr>
+</table>
+
+<!-- ========================================================================= -->
+<!-- 5. SUMMARY AND STATUS                                                     -->
+<!-- ========================================================================= -->
+<h1>5. Review Summary</h1>
+<p>
+  The <strong>Second Review Phase</strong> confirms the architectural integrity, robust database modeling, and technical rigor of <strong>Aura Money</strong>. By pairing a reactive TypeScript/React frontend with serverless Cloud Firestore security boundaries, the platform achieves both instantaneous financial analysis and enterprise data isolation.
+</p>
+<p>
+  All system modules—from transaction ingestion and dynamic budget threshold warnings to 12-month visual cashflow analytics and RFC 4180-compliant CSV exports—are fully functional, passing 100% of defined verification test plans.
+</p>
+
+</body>
+</html>

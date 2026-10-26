@@ -1,0 +1,451 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>Aura Money - First Review Project Report</title>
+<style>
+  body {
+    font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #1E293B;
+    margin: 1in;
+  }
+  h1 {
+    font-size: 22pt;
+    color: #0F172A;
+    border-bottom: 2pt solid #4AA89E;
+    padding-bottom: 6px;
+    margin-top: 24pt;
+    margin-bottom: 12pt;
+  }
+  h2 {
+    font-size: 15pt;
+    color: #2D3748;
+    border-bottom: 1pt solid #CBD5E1;
+    padding-bottom: 4px;
+    margin-top: 18pt;
+    margin-bottom: 8pt;
+  }
+  h3 {
+    font-size: 12pt;
+    color: #334155;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    text-align: justify;
+  }
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    padding-left: 24pt;
+  }
+  li {
+    margin-bottom: 4pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10pt;
+    margin-bottom: 14pt;
+    font-size: 10pt;
+  }
+  th {
+    background-color: #E2F1EF;
+    color: #134E48;
+    font-weight: bold;
+    text-align: left;
+    padding: 8pt;
+    border: 1pt solid #CBD5E1;
+  }
+  td {
+    padding: 7pt;
+    border: 1pt solid #CBD5E1;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td {
+    background-color: #F8FAFC;
+  }
+  .title-block {
+    text-align: center;
+    border-bottom: 3pt double #4AA89E;
+    padding-bottom: 18pt;
+    margin-bottom: 24pt;
+  }
+  .title-block h1 {
+    font-size: 26pt;
+    color: #0F172A;
+    border: none;
+    margin-bottom: 4pt;
+  }
+  .title-block .subtitle {
+    font-size: 14pt;
+    color: #4AA89E;
+    font-weight: bold;
+    margin-bottom: 12pt;
+  }
+  .title-block .meta {
+    font-size: 10.5pt;
+    color: #64748B;
+  }
+  .uml-box {
+    background-color: #F1F5F9;
+    border: 1pt solid #94A3B8;
+    padding: 10pt;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    margin: 10pt 0;
+    white-space: pre;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2pt 6pt;
+    background-color: #E6FFFA;
+    color: #234E52;
+    border-radius: 4pt;
+    font-weight: bold;
+    font-size: 9pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="title-block">
+  <h1>AURA MONEY</h1>
+  <div class="subtitle">Cloud-Enabled Personal Financial Management &amp; Analytical Wealth System</div>
+  <div class="meta">
+    <strong>Project Review:</strong> First Review Phase &nbsp;|&nbsp;
+    <strong>Application Architecture:</strong> React 18, TypeScript, Tailwind CSS, Cloud Firestore, Firebase Authentication &nbsp;|&nbsp;
+    <strong>Author / Lead:</strong> Ashwitha Rao
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- 1. ABSTRACT                                                               -->
+<!-- ========================================================================= -->
+<h1>1. Abstract</h1>
+<p>
+  The modern economic landscape has witnessed an exponential proliferation of digital transactions, multiple earning channels, and fragmented payment instruments. In this dynamic context, maintaining rigorous financial health has become increasingly complex for individuals and households. Conventional methods—such as static spreadsheet templates, physical ledgers, or opaque banking apps—fail to provide real-time budget feedback, multi-year spending insights, or granular cashflow controls.
+</p>
+<p>
+  <strong>Aura Money</strong> is conceived and engineered as an intuitive, high-performance, single-page cloud application (SPA) designed to empower users with full autonomy over their financial lives. The primary objective of this project is to build a secure, responsive, and aesthetically refined platform that seamlessly unifies income tracking, expense categorization, real-time budget variance monitoring, and multi-scale visual analytics spanning monthly trajectories and multi-year comparisons.
+</p>
+<p>
+  During this <strong>First Review Phase</strong>, the core architectural foundation and operational modules of the system have been successfully designed, implemented, and verified:
+</p>
+<ul>
+  <li><strong>Cloud State &amp; Secure Authentication:</strong> Integrated Firebase Authentication with Google Federated Single Sign-On and Cloud Firestore for resilient, owner-bound document persistence.</li>
+  <li><strong>Unified Financial Ledger:</strong> Developed responsive, schema-validated entry mechanisms for recording inflows (salaries, freelance earnings, investments, recurring deposits) and outflows categorized across key living domains (Housing, Groceries, Utilities, Transportation, Entertainment, Health, and Education).</li>
+  <li><strong>Real-Time Budget Engine:</strong> Implemented proactive budget controls featuring automated progress thresholds, warning indicators (&gt;90% consumption), and deficit alerts without page reloads.</li>
+  <li><strong>Multi-Scale Visual Analytics &amp; Reporting:</strong> Built rich data visualization suites utilizing Recharts and D3 principles, encompassing 12-month annual cashflow bar charts, cumulative net savings curves, category distribution donuts, and daily spend trajectories.</li>
+  <li><strong>Dual-Scope Financial Export Subsystem:</strong> Engineered a robust, RFC 4180-compliant CSV generation engine supporting both monthly summaries and comprehensive multi-year reports with sanitized ledger records and executive summaries.</li>
+</ul>
+<p>
+  The system adheres to OWASP Top 10 security standards, zero-hardcoding credential hygiene, and responsive layout guidelines, delivering sub-second update cycles across desktop, tablet, and mobile environments.
+</p>
+
+<!-- ========================================================================= -->
+<!-- 2. INTRODUCTION                                                           -->
+<!-- ========================================================================= -->
+<h1>2. Introduction</h1>
+
+<h2>2.1 Background of the Project Work</h2>
+<p>
+  Personal financial literacy and active cashflow management are foundational pillars of individual economic stability. The transition toward cashless economies, digital wallets, unified payment interfaces (UPI), and recurring online subscriptions has radically decoupled consumer spending from physical currency awareness. Consequently, a substantial majority of individuals experience "invisible spending leakage"—untracked micropayments and lifestyle creep that steadily deplete potential savings reserves.
+</p>
+<p>
+  Aura Money was initiated to address this operational gap by engineering a clean, privacy-centric financial management dashboard that converts raw transactional data into actionable financial clarity.
+</p>
+
+<h2>2.2 Establishing the Context</h2>
+<p>
+  Existing personal finance software generally falls into two extremes:
+</p>
+<ol>
+  <li><strong>Complex, Commercial Banking Aggregators:</strong> These services demand full access to third-party bank credentials, display intrusive commercial advertisements for loans/credit cards, and present cluttered, opaque interfaces.</li>
+  <li><strong>Manual Spreadsheets (Excel / Google Sheets):</strong> While customizable, spreadsheets lack automated schema validation, are cumbersome to update on mobile devices, do not provide real-time budget threshold warnings, and are prone to formula corruption and accidental data deletion.</li>
+</ol>
+<p>
+  Aura Money bridges this divide by delivering a self-hosted, cloud-synchronized web application that provides the agility of a web dashboard with the rigor of enterprise database security and instantaneous graphical feedback.
+</p>
+
+<h2>2.3 Why This Problem Is Important</h2>
+<p>
+  Proactive financial monitoring yields tangible socioeconomic benefits:
+</p>
+<ul>
+  <li><strong>Deficit Prevention:</strong> Immediate feedback on category spending stops budget breaches before month-end.</li>
+  <li><strong>Informed Wealth Accumulation:</strong> Tracking net savings rate over rolling 12-month periods fosters disciplined investing and emergency buffer preparation.</li>
+  <li><strong>Tax and Audit Readiness:</strong> Structured itemized ledgers exportable to standardized CSV format dramatically simplify seasonal tax filings and personal audits.</li>
+  <li><strong>Psychological Peace of Mind:</strong> A clear, predictable visual representation of income-to-debt ratios eliminates financial uncertainty and cognitive stress.</li>
+</ul>
+
+<h2>2.4 Development Process Followed</h2>
+<p>
+  The project follows an <strong>Iterative Agile / Component-Driven Development Lifecycle</strong>:
+</p>
+<ul>
+  <li><strong>Phase 1: Domain Modeling &amp; Architecture:</strong> Definition of strict TypeScript domain models, Firestore database schema rules (`firestore.rules`), and cryptographic authentication boundaries.</li>
+  <li><strong>Phase 2: Core Transaction Engine:</strong> Incremental delivery of income logging, expense categorization, and date-partitioned Firestore document synchronizers.</li>
+  <li><strong>Phase 3: Budgeting &amp; Real-Time Aggregation:</strong> Reactive state pipeline calculating category utilization, variance thresholds, and savings rates across memoized selectors.</li>
+  <li><strong>Phase 4: Visual Analytics &amp; Reporting Suite:</strong> Integration of responsive SVG visualization components (Recharts), monthly spend curves, and annual 12-month performance grids.</li>
+  <li><strong>Phase 5: Data Extraction &amp; Quality Verification:</strong> Implementation of client-side CSV sanitization (CSV Injection prevention, UTF-8 BOM encoding) and rigorous linting/build automation.</li>
+</ul>
+
+<!-- ========================================================================= -->
+<!-- 3. ANALYSIS AND REQUIREMENTS                                              -->
+<!-- ========================================================================= -->
+<h1>3. Analysis and Requirements</h1>
+
+<h2>3.1 Problem Analysis</h2>
+<p>
+  Through user research and workflow evaluations, three core problem dimensions were identified:
+</p>
+<ul>
+  <li><strong>Data Entry Friction:</strong> Users abandon financial apps if logging an expense requires more than three interactions. The interface must provide streamlined, mobile-optimized modal dialogs with smart category defaults.</li>
+  <li><strong>Temporal Disconnect:</strong> Most budgeting applications treat months as isolated silos, hiding annual compounding trends. Users require both micro-scale (daily spend trajectory within the month) and macro-scale (12-month annual growth) analytical perspectives.</li>
+  <li><strong>Data Portability:</strong> Users demand true ownership of their data without vendor lock-in, necessitating one-click export of uncompressed, structured financial records.</li>
+</ul>
+
+<h2>3.2 UML Analysis Models</h2>
+
+<h3>3.2.1 Use Case Diagram</h3>
+<div class="uml-box">
++---------------------------------------------------------------------------------------+
+|                                    AURA MONEY SYSTEM                                  |
+|                                                                                       |
+|   +-------------------+                                                               |
+|   | Authenticated     |----( Authenticate via Google SSO )                            |
+|   | User              |                                                               |
+|   +-------------------+----( Record Income Entry )                                    |
+|             |                                                                         |
+|             +--------------( Record / Categorize Expense )                            |
+|             |                                                                         |
+|             +--------------( Define &amp; Adjust Monthly Category Budgets )                |
+|             |                                                                         |
+|             +--------------( Monitor Real-Time Budget Progress &amp; Warning Flags )       |
+|             |                                                                         |
+|             +--------------( View Monthly Spend Trajectory &amp; Donut Charts )           |
+|             |                                                                         |
+|             +--------------( View 12-Month Annual Cashflow &amp; Cumulative Net Growth )  |
+|             |                                                                         |
+|             +--------------( Export Monthly Comprehensive CSV Report )                |
+|             |                                                                         |
+|             +--------------( Export Annual 12-Month Performance CSV Ledger )          |
+|                                                                                       |
++---------------------------------------------------------------------------------------+
+</div>
+
+<h3>3.2.2 Class / Domain Model Diagram</h3>
+<div class="uml-box">
++------------------------------------+        +------------------------------------+
+|            IncomeEntry             |        |            ExpenseEntry            |
++------------------------------------+        +------------------------------------+
+| + id: string                       |        | + id: string                       |
+| + userId: string                   |        | + userId: string                   |
+| + date: string (YYYY-MM-DD)        |        | + date: string (YYYY-MM-DD)        |
+| + source: string                   |        | + category: string                 |
+| + amount: number                   |        | + amount: number                   |
+| + isRecurring: boolean             |        | + paymentMethod: string            |
+| + notes?: string                   |        | + notes?: string                   |
+| + createdAt: string                |        | + createdAt: string                |
++------------------------------------+        +------------------------------------+
+                   \                                     /
+                    \                                   /
+                     \                                 /
+                      +-------------------------------+
+                      |          BudgetEntry          |
+                      +-------------------------------+
+                      | + id: string                  |
+                      | + userId: string              |
+                      | + month: string (YYYY-MM)     |
+                      | + category: string            |
+                      | + limit: number               |
+                      +-------------------------------+
+                                      |
+                                      v
+                      +-------------------------------+
+                      |         BudgetStatus          |
+                      +-------------------------------+
+                      | + category: string            |
+                      | + limit: number               |
+                      | + spent: number               |
+                      | + remaining: number           |
+                      | + percentage: number          |
+                      | + status: 'ok'|'warning'|'ex' |
+                      +-------------------------------+
+</div>
+
+<h3>3.2.3 Sequence Diagram: Transaction Logging &amp; Reactive Budget Updating</h3>
+<div class="uml-box">
+User                  UI / Modal Component               State Manager / Hook              Cloud Firestore
+ |                             |                                   |                              |
+ |-- 1. Submit Expense Form -->|                                   |                              |
+ |   (Amount, Category, Date)  |-- 2. Validate Input Payload ----->|                              |
+ |                             |      (Strict types, non-null)     |                              |
+ |                             |                                   |-- 3. Write Document -------->|
+ |                             |                                   |      (Collection: expenses)  |
+ |                             |                                   |<-- 4. Acknowledge Write -----|
+ |                             |                                   |                              |
+ |                             |<-- 5. Broadcast State Update -----|                              |
+ |                             |                                   |                              |
+ |                             |-- 6. Recalculate Aggregates ----->|                              |
+ |                             |      (Total Outflow, BudgetStatus,|                              |
+ |                             |       Net Savings, Trajectory)    |                              |
+ |                             |                                   |                              |
+ |<-- 7. Re-render UI View ----|                                   |                              |
+ |    (Updated KPI Card,       |                                   |                              |
+ |     Progress Bar, Alert)    |                                   |                              |
+</div>
+
+<h2>3.3 System-Level Requirements</h2>
+<table>
+  <tr>
+    <th>System Component</th>
+    <th>Specification / Constraint</th>
+  </tr>
+  <tr>
+    <td><strong>Target Platform</strong></td>
+    <td>Cross-platform Modern Web Browsers (Google Chrome 110+, Mozilla Firefox 110+, Safari 16+, Microsoft Edge).</td>
+  </tr>
+  <tr>
+    <td><strong>Client Environment</strong></td>
+    <td>Any desktop, tablet, or smartphone device with an active JavaScript V8/JSC runtime engine and viewport width &gt;= 320px.</td>
+  </tr>
+  <tr>
+    <td><strong>Cloud Backend</strong></td>
+    <td>Google Cloud Platform (Cloud Run managed container, Cloud Firestore NoSQL Database, Firebase Identity Services).</td>
+  </tr>
+  <tr>
+    <td><strong>Network Requirement</strong></td>
+    <td>Standard HTTPS / WebSocket connectivity over TLS 1.3 with graceful offline cache recovery.</td>
+  </tr>
+  <tr>
+    <td><strong>Latency Threshold</strong></td>
+    <td>Sub-150ms client-side reactivity for all filtering, aggregation, and view-switching operations.</td>
+  </tr>
+</table>
+
+<h2>3.4 Software-Level Requirements</h2>
+
+<h3>3.4.1 Functional Requirements (FR)</h3>
+<ul>
+  <li><strong>FR-1: User Authentication:</strong> The system shall authenticate users via Firebase Google Single Sign-On and maintain isolated session states bound to the authenticated `uid`.</li>
+  <li><strong>FR-2: Inflow Management:</strong> The system shall record, edit, and delete income records with attributes for date, source, monetary value, recurring flag, and optional notes.</li>
+  <li><strong>FR-3: Outflow Categorization:</strong> The system shall record expense records with standardized categorizations (Housing, Food, Utilities, Transport, Health, Entertainment, Education, etc.) and payment methods.</li>
+  <li><strong>FR-4: Budget Definition &amp; Adherence:</strong> The system shall enable setting monthly budget caps per category, calculating real-time percentage consumption, and highlighting near-limit (&gt;90%) or exceeded status.</li>
+  <li><strong>FR-5: Visual Dashboard Analytics:</strong> The system shall generate dynamic graphs including monthly cashflow bars, daily spending trajectory lines, and category distribution donut charts.</li>
+  <li><strong>FR-6: Multi-Year Reporting Suite:</strong> The system shall support a Dedicated Yearly Mode with a 12-month performance matrix table, annual total inflow/outflow cards, and cumulative savings growth curves.</li>
+  <li><strong>FR-7: Structured CSV Export Engine:</strong> The system shall generate and download RFC 4180-compliant CSV files for both monthly snapshots and comprehensive annual ledgers with a single click.</li>
+</ul>
+
+<h3>3.4.2 Non-Functional Requirements (NFR)</h3>
+<ul>
+  <li><strong>NFR-1: Security &amp; Data Isolation (OWASP):</strong> Firestore security rules must strictly enforce owner-bound read/write policies (`request.auth.uid == userId`). Zero anonymous write privileges.</li>
+  <li><strong>NFR-2: Formula Injection Prevention:</strong> All exportable fields must undergo strict sanitization and RFC 4180 escaping to neutralize CSV Formula Injection threats in client spreadsheet tools.</li>
+  <li><strong>NFR-3: Performance &amp; Scalability:</strong> Memoized selector pipelines (`useMemo`) must prevent redundant recalculations on unrelated state updates, ensuring smooth 60 FPS transitions.</li>
+  <li><strong>NFR-4: Responsive Ergonomics:</strong> The layout must seamlessly adapt across mobile (&lt;640px), tablet (640px–1023px), and desktop (&gt;=1024px) with dedicated full-height sliding navigation drawers and touch targets &gt;= 44px.</li>
+  <li><strong>NFR-5: Accessibility:</strong> Contrast ratios must satisfy WCAG AA standards (minimum 4.5:1 for body text) across all warm neutral surfaces.</li>
+</ul>
+
+<!-- ========================================================================= -->
+<!-- 4. PROBLEM DESCRIPTION / MODULES DESCRIPTION                              -->
+<!-- ========================================================================= -->
+<h1>4. Problem Description / Modules Description</h1>
+
+<p>
+  Aura Money is architecturally structured into seven cohesive, decoupled modules that communicate via a centralized unidirectional data flow. Below is a comprehensive description of the work and functional scope involved in each module:
+</p>
+
+<h2>Module 1: Authentication &amp; User Profile Management</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Manages user identification, session lifecycles, and security credentials.</li>
+  <li><strong>Implementation Details:</strong> Implements Google Federated Single Sign-On using the Firebase Auth client SDK. Bypasses the hazards of storing or transmitting raw passwords in application memory.</li>
+  <li><strong>State Handling:</strong> Uses the `onAuthStateChanged` reactive listener to hydrate user profile attributes (Display Name, Email, Profile Picture URL, Unique UID). If unauthenticated, access to financial sub-trees is securely gated.</li>
+</ul>
+
+<h2>Module 2: Income &amp; Inflow Management Engine</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Handles recording, tracking, and aggregating all monetary inflows.</li>
+  <li><strong>Implementation Details:</strong> Captures income source metadata (Salary, Consulting, Investments, Rental, Gifts), timestamped dates, and recurring status flags.</li>
+  <li><strong>Reactive Ingestion:</strong> Stores documents in user-scoped Firestore subcollections (`/users/{uid}/incomes/{id}`). Employs real-time snapshot listeners to sync changes immediately across all browser tabs.</li>
+</ul>
+
+<h2>Module 3: Expense &amp; Outflow Categorization Engine</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Provides a frictionless interface for logging expenditures with instant categorization.</li>
+  <li><strong>Implementation Details:</strong> Integrates an extensive catalog of predefined expense domains paired with distinctive color tokens and Lucide iconography for rapid cognitive recognition.</li>
+  <li><strong>Payment Metadata:</strong> Captures payment methods (UPI, Credit Card, Debit Card, Net Banking, Cash) and contextual user notes, establishing an audit trail for downstream spending retrospectives.</li>
+</ul>
+
+<h2>Module 4: Dynamic Budgeting &amp; Variance Monitoring Module</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Establishes financial guardrails and computes real-time budget status metrics.</li>
+  <li><strong>Implementation Details:</strong> Computes the exact monetary variance: `Remaining = Budget Limit - Total Spent in Category`. Calculates percentage utilization: `(Total Spent / Budget Limit) * 100`.</li>
+  <li><strong>Visual Alert Thresholds:</strong>
+    <ul>
+      <li><span class="badge">Within Budget</span> &lt; 90% consumption: Soft emerald indicator.</li>
+      <li><span class="badge">Near Limit</span> 90% to 99% consumption: Amber warning indicator prompting spending moderation.</li>
+      <li><span class="badge">Over Budget</span> &gt;= 100% consumption: Crimson alert displaying exact deficit amounts.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Module 5: Interactive Executive Dashboard &amp; KPI Metrics</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Consolidates high-level metrics onto a single responsive command canvas.</li>
+  <li><strong>Implementation Details:</strong>
+    <ul>
+      <li><strong>Executive KPI Ribbon:</strong> Real-time summary of Total Inflow, Total Outflow, Net Savings Buffer, and Savings Rate (%).</li>
+      <li><strong>Month Navigation Controls:</strong> Interactive temporal switcher enabling seamless historical browsing and future forecasting across calendar months.</li>
+      <li><strong>Recent Activity Feed:</strong> Chronological ledger of the latest transactions with instant inline editing and deletion capabilities.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Module 6: Advanced Monthly &amp; Annual Reporting Module</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Deep-dive analytical reporting with dual temporal scope (Monthly vs. Yearly).</li>
+  <li><strong>Implementation Details:</strong>
+    <ul>
+      <li><strong>Monthly Analytics:</strong> Features daily spend trajectory lines compared against cumulative averages, category proportion donut charts, and itemized timeline feeds.</li>
+      <li><strong>Yearly Analytics:</strong> Aggregates 12 calendar months into a unified annual performance matrix. Displays side-by-side Inflow vs. Outflow monthly bar charts, annual category allocation donuts, and a cumulative net savings growth curve illustrating annual wealth trajectory.</li>
+      <li><strong>Year Selector:</strong> Cycle through active financial years with previous/next controls or a quick dropdown.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>Module 7: CSV Data Extraction &amp; Export Subsystem</h2>
+<ul>
+  <li><strong>Scope of Work:</strong> Client-side generation of standardized, spreadsheet-ready financial files.</li>
+  <li><strong>Implementation Details:</strong>
+    <ul>
+      <li><strong>RFC 4180 Compliance:</strong> Implements defensive quote wrapping and escape algorithms (`escapeCell`) to neutralize CSV formula injection exploits.</li>
+      <li><strong>Unicode / Currency Support:</strong> Encodes all output files with the UTF-8 Byte Order Mark (`\uFEFF`) to guarantee seamless rendering of currency symbols (₹, $, €) across Microsoft Excel, Apple Numbers, and Google Sheets.</li>
+      <li><strong>Export Scopes:</strong>
+        <ol>
+          <li><em>Monthly Comprehensive Report:</em> Executive summary, category variance, daily trajectory, and itemized transaction tables.</li>
+          <li><em>Annual Comprehensive Report:</em> Annual KPI summary, 12-month performance matrix, category annual totals, and chronological 365-day ledger.</li>
+          <li><em>Targeted CSVs:</em> Daily spending trends only, Budget adherence only, 12-Month cashflow table only, or Category distributions only.</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<!-- ========================================================================= -->
+<!-- 5. CONCLUSION AND FUTURE ROADMAP                                          -->
+<!-- ========================================================================= -->
+<h1>5. Conclusion &amp; Future Roadmap</h1>
+<p>
+  The First Review milestone of <strong>Aura Money</strong> successfully validates the technical feasibility, architectural robustness, and user utility of a modern cloud-synchronized personal finance system. By unifying real-time data persistence, reactive budget variance tracking, multi-scale visual analytics, and standardized CSV exports, the platform provides a complete financial command center.
+</p>
+<p>
+  Subsequent project phases will focus on introducing automated recurring transaction triggers, multi-currency conversion APIs, and customizable target savings goals.
+</p>
+
+</body>
+</html>
